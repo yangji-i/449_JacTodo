@@ -99,69 +99,161 @@ jac start main.jac      # start server (default: http://localhost:8000)
 
 ---
 
-## Troubleshooting
+# Using TaskFlow Web App
 
-### 1) UI stuck on “Generating…” for 30+ seconds
-Most common causes:
-- API key not exported in the terminal that launched the server
-- Invalid/expired key
-- Rate limit / network issue
-
-Fix:
-1) Stop the server (Ctrl+C)
-2) Export the key again:
-```bash
-export ANTHROPIC_API_KEY="YOUR_KEY_HERE"
-```
-3) Start again:
-```bash
-jac start main.jac
-```
-
-### 2) `curl http://localhost:8000/` returns nothing
-Try checking if the server is running and listening:
-- Make sure `jac start main.jac` is running in a terminal.
-- If you changed ports, open the correct URL.
-
-### 3) GitHub push rejected (large files detected)
-You accidentally committed a Python environment or build artifacts (e.g., `jac*_env/`, `.venv/`, `.jac/`). GitHub rejects files > 100 MB.
-
-Fix (recommended):
-1) Add ignores (see `.gitignore` below)
-2) Remove tracked env/build files from git index:
-```bash
-git rm -r --cached .venv .jac jac*_env
-git commit -m "Remove env/build artifacts from repo"
-```
-3) Push again:
-```bash
-git push
-```
-
-If the large files are already in history, you must rewrite history (course/TA permitting):
-- Use `git filter-repo` or `BFG Repo-Cleaner` on a **fresh clone**.
+TaskFlow is a web-based, multi-user todo application built with **Jac / Jaseci**, enhanced with **AI-powered features**. This document explains how to use the TaskFlow web interface and what each feature does.
 
 ---
 
-## Recommended `.gitignore`
-Create a `.gitignore` at the repo root (or merge into your existing one):
+## Accessing the App
 
-```gitignore
-# Jac build/cache
-.jac/
+1. Start the application:
+   ```bash
+   jac start main.jac
+   ```
+2. Open your browser and go to:
+   ```
+   http://localhost:8000
+   ```
 
-# Python virtual environments
-.venv/
-venv/
-jac*_env/
+---
 
-# Python cache
-__pycache__/
-*.pyc
+## Authentication
 
-# Node (if used)
-node_modules/
+### Sign Up
+- Enter a **username** and **password**
+- Click **Sign Up**
+- After successful registration, you will be logged in automatically
 
-# OS files
-.DS_Store
+### Sign In
+- Enter your existing credentials
+- Click **Sign In**
+
+### Sign Out
+- Click the **Sign Out** button in the top-right corner
+
+---
+
+## Todo List Features
+
+### Add a Todo
+- Type a task description in the input field
+- Press **Enter** or click **Add**
+
+Each todo is automatically:
+- Assigned a unique ID
+- Categorized using AI (WORK, PERSONAL, SHOPPING, HEALTH, OTHER)
+
+---
+
+### View Todos
+- All todos are displayed in a list
+- Each item shows:
+  - Task title
+  - Completion status
+  - Category badge (if not `OTHER`)
+
+---
+
+### Complete / Uncomplete a Todo
+- Click the **checkbox** next to a todo
+- The task will toggle between completed and uncompleted states
+
+---
+
+### Delete a Todo
+- Click the **×** button next to a todo
+- The todo is permanently removed
+
+---
+
+### Remaining Task Counter
+- Displays how many tasks are still incomplete
+
+---
+
+## AI Task Decomposition
+
+TaskFlow supports AI-assisted task breakdown.
+
+### What It Does
+- Takes a complex task
+- Uses an LLM to generate **3–5 smaller, actionable sub-tasks**
+- Automatically adds them as new todos
+
+### Example
+Original todo:
 ```
+Prepare for final exams
+```
+
+Generated subtasks:
+```
+- Review lecture notes
+- Create study schedule
+- Practice past exams
+- Identify weak topics
+```
+
+Each generated sub-task:
+- Is stored as a normal todo
+- Is auto-categorized using AI
+
+---
+
+## Meal Planner Feature
+
+### Generate a Shopping List
+1. Enter a meal description (e.g. `spaghetti bolognese for 4`)
+2. Click **Generate**
+
+The AI will return a list of ingredients with:
+- Name
+- Quantity
+- Unit
+- Estimated cost
+- Carbohydrate indicator
+
+---
+
+### View Ingredients
+- Ingredients are displayed as a list
+- Each item shows:
+  - Ingredient name
+  - Quantity and unit
+  - Estimated price
+  - “Carbs” badge if high in carbohydrates
+
+---
+
+### Total Cost
+- Displays the total estimated cost of the generated shopping list
+
+---
+
+### Clear Shopping List
+- Click **Clear**
+- Removes all generated ingredients
+
+---
+
+## Notes
+
+- AI-powered features (categorization, decomposition, meal planning) require a valid LLM API key
+- Slow responses usually indicate missing or misconfigured API credentials
+- The app is designed for **local development and coursework use**
+
+---
+
+## Summary of Features
+
+- User authentication (sign up / sign in)
+- AI auto-categorized todos
+- Task completion tracking
+- AI task decomposition
+- AI meal planning and shopping list generation
+- Real-time UI updates via Jac frontend
+
+---
+
+Enjoy using **TaskFlow** 🚀
