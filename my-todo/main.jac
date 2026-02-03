@@ -1,22 +1,39 @@
 import from uuid { uuid4 }
 cl import "./styles.css";
 
+import from byllm.lib { Model }
+
+glob llm = Model(model_name="claude-sonnet-4-20250514");
+
+enum Category { WORK, PERSONAL, SHOPPING, HEALTH, OTHER }
+
+def categorize(title: str) -> Category by llm();
+
+
 # A node becomes a persistent data container in the graph when attached to a root node
 node Todo {
     has id: str,
         title: str,
-        done: bool = False;
+        done: bool = False,
+        category: str = "other";
 }
 
-"""Add a todo and return it."""
+"""Add a todo with AI categorization."""
 def:pub add_todo(title: str) -> dict {
-    todo = root ++> Todo(id=str(uuid4()), title=title);
-    return {"id": todo[0].id, "title": todo[0].title, "done": todo[0].done};
+    category = str(categorize(title)).split(".")[-1].lower();
+    todo = root ++> Todo(id=str(uuid4()), title=title, category=category);
+    return {
+        "id": todo[0].id, "title": todo[0].title,
+        "done": todo[0].done, "category": todo[0].category
+    };
 }
 
 """Get all todos."""
 def:pub get_todos -> list {
-    return [{"id": t.id, "title": t.title, "done": t.done} for t in [root-->](`?Todo)];
+    return [
+        {"id": t.id, "title": t.title, "done": t.done, "category": t.category}
+        for t in [root-->](`?Todo)
+    ];
 }
 
 """Toggle a todo's done status."""
@@ -24,7 +41,10 @@ def:pub toggle_todo(id: str) -> dict {
     for todo in [root-->](`?Todo) {
         if todo.id == id {
             todo.done = not todo.done;
-            return {"id": todo.id, "title": todo.title, "done": todo.done};
+            return {
+                "id": todo.id, "title": todo.title,
+                "done": todo.done, "category": todo.category
+            };
         }
     }
     return {};
@@ -61,7 +81,10 @@ cl def:pub app -> any {
         await toggle_todo(id);
         items = items.map(
             lambda t: any -> any {
-                return {"id": t.id, "title": t.title, "done": not t.done}
+                return {
+                    "id": t.id, "title": t.title,
+                    "done": not t.done, "category": t.category
+                }
                 if t.id == id else t;
             }
         );
@@ -99,6 +122,7 @@ cl def:pub app -> any {
                     <span class={"todo-title " + ("todo-done" if t.done else "")}>
                         {t.title}
                     </span>
+                    <span class="category">{t.category}</span>
                     <button
                         class="btn-delete"
                         onClick={lambda -> None { remove(t.id); }}
