@@ -1,23 +1,13 @@
-# Jac project
-packages/
-*.jbc
-*.jir
-
-# Python
-__pycache__/
-*.py[cod]
-.venv/
+# virtual environments
+env/
 venv/
+.venv/
+jac12_env/
 
-# IDE
-.idea/
-.vscode/
-*.swp
+# python cache
+__pycache__/
+*.pyc
 
-# Node.js
-node_modules/
-
-# Build artifacts
+# jac build/runtime
 .jac/
-*.session
-*.session.*
+data/
