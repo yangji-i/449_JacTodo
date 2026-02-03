@@ -1,9 +1,11 @@
 """TaskFlow - A multi-user todo app with AI meal planning."""
 
+import from typing { Any }
+
 cl {
     import from frontend { app as ClientApp }
 
-    def:pub app -> any {
+    def:pub app -> Any {
         return
             <ClientApp />;
     }
@@ -13,8 +15,6 @@ import from byllm.lib { Model }
 import from uuid { uuid4 }
 
 glob llm = Model(model_name="claude-sonnet-4-20250514");
-
-# --- AI Types ---
 
 enum Category { WORK, PERSONAL, SHOPPING, HEALTH, OTHER }
 
@@ -40,8 +40,6 @@ def generate_ingredients(meal_description: str) -> list[Ingredient] by llm();
 """Break down a complex task into 3-5 smaller, actionable sub-tasks."""
 def decompose_task(title: str) -> list[str] by llm();
 
-# --- Data Nodes ---
-
 node Todo {
     has id: str,
         title: str,
@@ -56,8 +54,6 @@ node MealIngredient {
         cost: float,
         carby: bool;
 }
-
-# --- Todo Walkers ---
 
 walker:priv AddTodo {
     has title: str;
@@ -132,15 +128,11 @@ walker:priv DeleteTodo {
     }
 }
 
-# --- Meal Planner Walkers ---
-
 walker:priv GenerateShoppingList {
     has meal_description: str;
 
     can generate with `root entry {
-        # First clear old ingredients
         visit [-->];
-        # Then generate new ones
         ingredients = generate_ingredients(self.meal_description);
         result: list = [];
         for ing in ingredients {
@@ -205,17 +197,21 @@ walker:priv DecomposeTask {
     has todo_id: str;
 
     can search_and_decompose with `root entry {
-        visit [--> node::Todo];
+        visit [-->];
     }
 
     can process_todo with Todo entry {
         if here.id == self.todo_id {
             sub_tasks = decompose_task(here.title);
-
             for task_title in sub_tasks {
                 new_category = str(categorize(task_title)).split(".")[-1].lower();
+                root ++> Todo(
+                    id=str(uuid4()),
+                    title=task_title,
+                    category=new_category
+                );
             }
-            report {"success": True, "subtasks_count": sub_tasks.length};
+            report {"success": True};
         }
     }
 }

@@ -12,7 +12,6 @@ sv import from main {
     AddTodo, ListTodos, ToggleTodo, DeleteTodo,
     GenerateShoppingList, ListMealPlan, ClearMealPlan
 }
-async def decomposeTask(todoId: str) -> None;
 
 def:pub app -> any {
     has isLoggedIn: bool = False,
@@ -56,6 +55,8 @@ def:pub app -> any {
     async def clearIngredients -> None;
     def handleMealKeyPress(e: any) -> None;
     def getIngredientsTotal -> float;
+    async def decomposeTask(todoId: str) -> None;
+
 
     if checkingAuth {
         return
@@ -121,6 +122,7 @@ def:pub app -> any {
                                                         todo={todo}
                                                         onToggle={toggleTodo}
                                                         onDelete={deleteTodo}
+                                                        onDecompose={decomposeTask}
                                                     /> for todo in todos
                                                 ]}
                                             </div>
