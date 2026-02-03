@@ -1,0 +1,10 @@
+
+# virtual env
+jac12_env/
+env/
+venv/
+.venv/
+
+# jac artifacts
+.jac/
+data/
