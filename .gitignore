@@ -8,3 +8,16 @@ venv/
 # jac artifacts
 .jac/
 data/
+
+.jac/
+
+# Python venvs
+env/
+venv/
+.venv/
+jac12_env/
+
+# Python cache
+__pycache__/
+*.pyc
+EOF
